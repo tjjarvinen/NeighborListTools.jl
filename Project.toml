@@ -1,0 +1,13 @@
+name = "NeighborListTools"
+uuid = "252c77ef-e869-45fc-9102-44933f8f3486"
+authors = ["Teemu Järvinen and Timon S. Gutleb"]
+version = "1.0.0-DEV"
+
+[compat]
+julia = "1.9"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
