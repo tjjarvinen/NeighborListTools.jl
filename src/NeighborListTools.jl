@@ -1,10 +1,9 @@
 module NeighborListTools
+using LinearAlgebra, StaticArrays
+using AtomsIO, AtomsBase, Unitful
 
-using AtomsBase
-using StaticArrays
-
-export Cell
-export CellList
+export Cell, CellList
+export natoms, cellgrid, cellsort!, massivelyaddparticles!
 
 
 include("cell_list.jl")
