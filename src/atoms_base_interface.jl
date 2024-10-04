@@ -10,8 +10,12 @@ function form_cell_list(TA, sys, cutoff; use_fp32=true)
     spc = species(sys, :)
     box = bounding_box(sys)
     pbc = periodicity(sys)
+    cell_diag = SVector( box[1][1], box[2][2], box[3][3] )
+    if use_fp32
+        cell_diag = Float32.(cell_diag)
+    end
 
-    tmp = sort_data(r, spc, cutoff)
+    tmp = sort_data(r, spc, cutoff, cell_diag)
 
     return tmp
 end
@@ -26,6 +30,15 @@ form_cell_list(sys, cutoff; use_fp32=true) = form_cell_list(Array, sys, cutoff; 
     I =  @index(Global)
     @inbounds r =  R[I]
 
+    # wrap atoms inside the box
+    r1 = r[1] - (div(r[1], dcell[1]) -1) * dcell[1]
+    r1 = r1 - div(r1, dcell[1]) * dcell[1]
+    r2 = r[2] - (div(r[2], dcell[2]) -1) * dcell[2]
+    r2 = r2 - div(r2, dcell[2]) * dcell[2]
+    r3 = r[3] - (div(r[3], dcell[3]) -1) * dcell[3]
+    r3 = r3 - div(r3, dcell[3]) * dcell[3]
+
+    r = SVector(r1, r2, r3)
 
     # Calculate cell index
     @inbounds tia = ceil(r[1]/cutoff)
@@ -41,7 +54,7 @@ form_cell_list(sys, cutoff; use_fp32=true) = form_cell_list(Array, sys, cutoff; 
 end
 
 
-function sort_data(R, spc, cutoff, ncell)
+function sort_data(R, spc, cutoff, dcell)
     # sorting function
     f_sort(x,y) = x[2] < y[2]
 
@@ -52,7 +65,7 @@ function sort_data(R, spc, cutoff, ncell)
     data = similar(R, T)
 
     kernel = form_data(backend)
-    kernel(data, R, spc, cutoff; ndrange=length(R))
+    kernel(data, R, spc, cutoff, dcell; ndrange=length(R))
 
     sort!(data; lt=f_sort)
 
