@@ -26,7 +26,9 @@ function Base.getindex(cl::CellList, carindex::CartesianIndex)
 end
 
 function Base.getindex(cl::CellList, i)
-    indx = vcat(cl.cell_indices[i]...)
+    indx = vcat(i) do j
+        cl[j]
+    end
     return (
         positions = view(cl.postions, indx),
         species = view(cl.species, indx),

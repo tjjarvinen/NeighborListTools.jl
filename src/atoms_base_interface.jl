@@ -1,5 +1,10 @@
 
 
+function CellList(sys, cutoff::Unitful.Length)
+    form_cell_list(sys, cutoff)
+end
+
+
 function form_cell_list(TA, sys, cutoff; use_fp32=true)
     box = bounding_box(sys)
     # only orthorhombic cell allowed
