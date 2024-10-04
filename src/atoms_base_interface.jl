@@ -31,12 +31,12 @@ form_cell_list(sys, cutoff; use_fp32=true) = form_cell_list(Array, sys, cutoff; 
     @inbounds r =  R[I]
 
     # wrap atoms inside the box
-    r1 = r[1] - (div(r[1], dcell[1]) -1) * dcell[1]
-    r1 = r1 - div(r1, dcell[1]) * dcell[1]
-    r2 = r[2] - (div(r[2], dcell[2]) -1) * dcell[2]
-    r2 = r2 - div(r2, dcell[2]) * dcell[2]
-    r3 = r[3] - (div(r[3], dcell[3]) -1) * dcell[3]
-    r3 = r3 - div(r3, dcell[3]) * dcell[3]
+    @inbounds r1 = r[1] - (div(r[1], dcell[1]) -1) * dcell[1]
+    @inbounds r1 = r1 - div(r1, dcell[1]) * dcell[1]
+    @inbounds r2 = r[2] - (div(r[2], dcell[2]) -1) * dcell[2]
+    @inbounds r2 = r2 - div(r2, dcell[2]) * dcell[2]
+    @inbounds r3 = r[3] - (div(r[3], dcell[3]) -1) * dcell[3]
+    @inbounds r3 = r3 - div(r3, dcell[3]) * dcell[3]
 
     r = SVector(r1, r2, r3)
 
