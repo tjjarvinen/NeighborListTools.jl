@@ -1,23 +1,46 @@
 
 
 function form_cell_list(TA, sys, cutoff; use_fp32=true)
+    box = bounding_box(sys)
+    # only orthorhombic cell allowed
+    @argcheck box[1][2] ≈ box[1][3] ≈ zero(box[1][3])
+    @argcheck box[2][1] ≈ box[2][3] ≈ zero(box[2][3])
+    @argcheck box[3][1] ≈ box[3][2] ≈ zero(box[3][1])
+
     r = position(sys, :)
     if use_fp32
         r = map(r) do rᵢ
             Float32.(rᵢ)
         end
     end
-    spc = species(sys, :)
-    box = bounding_box(sys)
+    r = TA(r)
+    spc = TA(species(sys, :))
     pbc = periodicity(sys)
+
+    indx = similar(spc, Int32)
+    cell_indx = similar(indx)
+
     cell_diag = SVector( box[1][1], box[2][2], box[3][3] )
     if use_fp32
         cell_diag = Float32.(cell_diag)
     end
 
-    tmp = sort_data(r, spc, cutoff, cell_diag)
+    # Fit cutoff to cell boundaries
+    ncells = floor.(Int32, cell_diag / cutoff)
+    coff = cell_diag ./ ncells
 
-    return tmp
+    tmp = sort_data(r, spc, coff, cell_diag)
+
+    cells = move_data_to_cells!(indx, cell_indx, r, spc, tmp, ncells)
+
+    return CellList(
+        cell_diag,
+        cells.cells,
+        cutoff,
+        cells.index,
+        cells.pos,
+        cells.species
+    )
 end
 
 
@@ -41,14 +64,14 @@ form_cell_list(sys, cutoff; use_fp32=true) = form_cell_list(Array, sys, cutoff; 
     r = SVector(r1, r2, r3)
 
     # Calculate cell index
-    @inbounds tia = ceil(r[1]/cutoff)
+    @inbounds tia = floor(r[1]/cutoff[1])
     ia = unsafe_trunc(Int32, tia)
-    @inbounds tib = ceil(r[2]/cutoff)
+    @inbounds tib = floor(r[2]/cutoff[2])
     ib = unsafe_trunc(Int32, tib)
-    @inbounds tic = ceil(r[3]/cutoff)
+    @inbounds tic = floor(r[3]/cutoff[3])
     ic = unsafe_trunc(Int32, tic)
 
-    iabc = ic + 1_000*ib + 1_000_000*ia
+    iabc = (ia+1) + 1_000*(ib+1) + 1_000_000*(ic+1)
 
     @inbounds out[I] = (I, iabc, natom[I], r)
 end
@@ -70,4 +93,28 @@ function sort_data(R, spc, cutoff, dcell)
     sort!(data; lt=f_sort)
 
     return data
+end
+
+
+function move_data_to_cells!(indx, cell_indx, r, spc,  data, ncells)
+    @argcheck length(r) == length(spc) == length(data)
+
+    # This needs to be optimized
+    map!( x->x[1], indx, data )
+    map!( x->x[2], cell_indx, data )
+    map!( x->x[3], spc, data )
+    map!( x->x[4], r, data )
+
+    cells = similar(r, UnitRange{Int}, (ncells...) )
+
+    for ix in axes(cells,1), iy in axes(cells, 2), iz in axes(cells, 3)
+        cind = ix + iy*1000 + iz*1_000_000
+
+        # NOTE this does not work with GPU yet
+        # https://github.com/anicusan/AcceleratedKernels.jl has it
+        # but has not yet been registered yet
+        cells[ix,iy,iz] = searchsorted(cell_indx, cind)
+    end
+
+    return (pos=r, species=spc, index=indx, cell_index=cell_indx, cells=cells)
 end
