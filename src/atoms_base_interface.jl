@@ -39,7 +39,7 @@ function form_cell_list(TA, sys, cutoff; use_fp32=true)
     cells = move_data_to_cells!(indx, cell_indx, r, spc, tmp, ncells)
 
     return CellList(
-        cell_diag,
+        box,
         cells.cells,
         cutoff,
         cells.index,
