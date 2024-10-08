@@ -9,8 +9,8 @@ using StaticArrays
 using Unitful
 
 export CellList
-export get_site_pair_list
-export get_pair_list
+export get_site_pairlist
+export get_pairlist
 
 
 include("structs.jl")

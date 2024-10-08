@@ -25,7 +25,7 @@ function test_sitelist(sys, cutoff; use_fp32=false)
     s = size(cl)
     tmp = [ (i,j,k) for i in 1:s[1], j in 1:s[2], k in 1:s[2]]
     Threads.@threads for x in tmp
-        NeighborListTools.get_site_pair_list(cl, x...)
+        NeighborListTools.get_site_pairlist(cl, x...)
     end
 end
 
@@ -34,7 +34,7 @@ function test_pairlist(sys, cutoff; use_fp32=false)
     s = size(cl)
     tmp = [ (i,j,k) for i in 1:s[1], j in 1:s[2], k in 1:s[2]]
     Threads.@threads for x in tmp
-        NeighborListTools.get_pair_list(cl, x...)
+        NeighborListTools.get_pairlist(cl, x...)
     end
 end
 
@@ -93,22 +93,22 @@ cl_100_000 = NeighborListTools.form_cell_list(ar_100_000, cutoff; use_fp32=false
 cl_500_000 = NeighborListTools.form_cell_list(ar_500_000, cutoff; use_fp32=false)
 cl_1_000_000 = NeighborListTools.form_cell_list(ar_1_000_000, cutoff; use_fp32=false)
 
-SUITE["Pairs for one cell"]["center"] = @benchmarkable NeighborListTools.get_site_pair_list(
+SUITE["Pairs for one cell"]["center"] = @benchmarkable NeighborListTools.get_site_pairlist(
     $cl_100_000,
     2,2,2
 )
 
-SUITE["Pairs for one cell"]["plane surface"] = @benchmarkable NeighborListTools.get_site_pair_list(
+SUITE["Pairs for one cell"]["plane surface"] = @benchmarkable NeighborListTools.get_site_pairlist(
     $cl_500_000,
     2,2,1
 )
 
-SUITE["Pairs for one cell"]["two plane intersection"] = @benchmarkable NeighborListTools.get_site_pair_list(
+SUITE["Pairs for one cell"]["two plane intersection"] = @benchmarkable NeighborListTools.get_site_pairlist(
     $cl_1_000_000,
     2,1,1
 )
 
-SUITE["Pairs for one cell"]["corner"] = @benchmarkable NeighborListTools.get_site_pair_list(
+SUITE["Pairs for one cell"]["corner"] = @benchmarkable NeighborListTools.get_site_pairlist(
     $cl_1_000_000,
     1,1,1
 )

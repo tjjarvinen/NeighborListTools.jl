@@ -18,7 +18,7 @@ using Test
     @test haskey(w, :species)
     @test haskey(w, :sift)
 
-    pairs = get_site_pair_list(q, 1,1,1)
+    pairs = get_site_pairlist(q, 1,1,1)
 
     @test haskey(pairs, :r)
     @test haskey(pairs, :species1)
@@ -28,7 +28,7 @@ using Test
     @test haskey(pairs, :indx1)
     @test haskey(pairs, :indx2)
 
-    pairs = get_pair_list(q, 1,1,1)
+    pairs = get_pairlist(q, 1,1,1)
 
     @test haskey(pairs, :r)
     @test haskey(pairs, :species1)

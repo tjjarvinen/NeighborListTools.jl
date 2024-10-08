@@ -4,6 +4,10 @@ function CellList(sys, cutoff::Unitful.Length; use_fp32=true)
     form_cell_list(sys, cutoff; use_fp32=use_fp32)
 end
 
+function CellList(TA, sys::AtomsBase.AbstractSystem, cutoff::Unitful.Length; use_fp32=true)
+    form_cell_list(TA, sys, cutoff; use_fp32=use_fp32)
+end
+
 
 function form_cell_list(TA, sys, cutoff; use_fp32=true)
     box = bounding_box(sys)

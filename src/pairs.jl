@@ -6,14 +6,14 @@ function get_pairs(cl::CellList, indx1::CartesianIndex, indx2::CartesianIndex)
     return get_pairs(cl, c1, c2)
 end
 
-function get_site_pair_list(cl::CellList, i::Int, j::Int, k::Int)
+function get_site_pairlist(cl::CellList, i::Int, j::Int, k::Int)
     c1 = cl[i,j,k]
     c2 = cl[i-1:i+1, j-1:j+1, k-1:k+1]
     return get_pairs(cl, c1, c2)
 end
 
-function get_site_pair_list(cl::CellList, carindex::CartesianIndex)
-    return get_site_pair_list(cl, carindex[1], carindex[2], carindex[3])
+function get_site_pairlist(cl::CellList, carindex::CartesianIndex)
+    return get_site_pairlist(cl, carindex[1], carindex[2], carindex[3])
 end
 
 
@@ -44,12 +44,12 @@ function get_pairs(cl::CellList, c1, c2)
     )
 end
 
-function get_pair_list(cl::CellList, i::Int, j::Int, k::Int)
+function get_pairlist(cl::CellList, i::Int, j::Int, k::Int)
     c1 = cl[i,j,k]
     c2 = cl[i:i+1, j:j+1, k:k+1]
     return get_pairs(cl, c1, c2)
 end
 
-function get_pair_list(cl::CellList, carindex::CartesianIndex)
-    return get_pair_list(cl, carindex[1], carindex[2], carindex[3])
+function get_pairlist(cl::CellList, carindex::CartesianIndex)
+    return get_pairlist(cl, carindex[1], carindex[2], carindex[3])
 end
