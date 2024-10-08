@@ -10,7 +10,7 @@ using Test
     cutoff = 9.0u"Å"
 
     sys = bulk(:Ar, cubic=true) * 20
-    q = NeighborListTools.form_cell_list(sys, cutoff)
+    q = CellList(sys, cutoff)
     w = q[1,1,1]
 
     @test haskey(w, :positions)
@@ -18,7 +18,7 @@ using Test
     @test haskey(w, :species)
     @test haskey(w, :sift)
 
-    pairs = NeighborListTools.get_site_pair_list(q, 1,1,1)
+    pairs = get_site_pair_list(q, 1,1,1)
 
     @test haskey(pairs, :r)
     @test haskey(pairs, :species1)
@@ -28,7 +28,7 @@ using Test
     @test haskey(pairs, :indx1)
     @test haskey(pairs, :indx2)
 
-    pairs = NeighborListTools.get_pair_list(q, 1,1,1)
+    pairs = get_pair_list(q, 1,1,1)
 
     @test haskey(pairs, :r)
     @test haskey(pairs, :species1)

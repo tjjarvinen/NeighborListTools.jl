@@ -1,7 +1,7 @@
 
 
-function CellList(sys, cutoff::Unitful.Length)
-    form_cell_list(sys, cutoff)
+function CellList(sys, cutoff::Unitful.Length; use_fp32=true)
+    form_cell_list(sys, cutoff; use_fp32=use_fp32)
 end
 
 
