@@ -49,7 +49,7 @@ pl.indx2
 
 # Go through the whole pair list
 for i in eachindex(cl)
-    pl = get_pair_list(cl, i)
+    pl = get_pairlist(cl, i)
     # do something
 end
 ```
