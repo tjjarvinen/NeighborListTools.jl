@@ -9,7 +9,7 @@ using Test
 @testset "basics" begin
     cutoff = 9.0u"Å"
 
-    sys = bulk(:Ar, cubic=true) * 50
+    sys = bulk(:Ar, cubic=true) * 20
     q = NeighborListTools.form_cell_list(sys, cutoff)
     w = q[1,1,1]
 
