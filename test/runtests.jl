@@ -5,10 +5,6 @@ using Test
 
 ##
 
-cutoff = 9.0u"Å"
-
-sys = bulk(:Ar, cubic=true) * 50
-q = NeighborListTools.form_cell_list(sys, cutoff)
 
 @testset "basics" begin
     cutoff = 9.0u"Å"
