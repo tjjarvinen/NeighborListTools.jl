@@ -97,7 +97,7 @@ function Base.getindex(cl::CellList, i, j, k)
     if 1<=minimum(i) && maximum(i)<=s[1] &&
             1<=minimum(j) && maximum(j)<=s[2] &&
             1<=minimum(k) && maximum(k)<=s[3]
-        indx = vcat(cl.cell_indices[i,j,k]...)
+        indx = reduce(vcat, cl.cell_indices[i,j,k])
         return (
             positions = view(cl.positions, indx),
             species = view(cl.species, indx),
