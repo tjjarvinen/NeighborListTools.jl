@@ -110,15 +110,15 @@ function move_data_to_cells!(indx, cell_indx, r, spc,  data, ncells)
     map!( x->x[3], spc, data )
     map!( x->x[4], r, data )
 
-    cells = similar(r, UnitRange{Int}, (ncells...) )
+    # Cell indices are used to create views. Thus they should stay on CPU
+    cells = similar(Array{UnitRange{Int}}, (ncells...) )
+    tmp = Array(cell_indx)
+
 
     for ix in axes(cells,1), iy in axes(cells, 2), iz in axes(cells, 3)
         cind = ix + iy*1000 + iz*1_000_000
 
-        # NOTE this does not work with GPU yet
-        # https://github.com/anicusan/AcceleratedKernels.jl has it
-        # but has not yet been registered yet
-        cells[ix,iy,iz] = searchsorted(cell_indx, cind)
+        cells[ix,iy,iz] = searchsorted(tmp, cind)
     end
 
     return (pos=r, species=spc, index=indx, cell_index=cell_indx, cells=cells)

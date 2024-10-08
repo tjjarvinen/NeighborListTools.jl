@@ -5,20 +5,32 @@ mutable struct CellList{TC, TP, TS, TI, TCO, TCE}
     cell_indices::TC
     cutoff::TCO
     indices::TI
-    postions::TP
+    positions::TP
     species::TS
 end
 
-Base.size(cl::CellList) = size(cl.cell_indices)
+# Change array type for CellList
+function CellList(TA, cl::CellList)
+    ta_positions = TA(cl.positions)
+    ta_species = TA(cl.species)
+    ta_indices = TA(cl.indices)
+    return CellList(
+        cl.cell,
+        cl.cell_indices,
+        cl.cutoff,
+        ta_indices,
+        ta_positions,
+        ta_species
+    )
+end
 
+Base.size(cl::CellList) = size(cl.cell_indices)
 Base.length(cl::CellList) = length(cl.cell_indices)
 
-
-AtomsBase.cell(cl::CellList) = cl.cell
-
+Base.axes(cl::CellList, i) = axes(cl.cell_indices, i)
 Base.IndexStyle(::CellList) = IndexCartesian()
-
 Base.keys(cl::CellList) = CartesianIndices(size(cl))
+
 
 
 function Base.getindex(cl::CellList, carindex::CartesianIndex)
@@ -30,7 +42,7 @@ function Base.getindex(cl::CellList, i)
         cl[j]
     end
     return (
-        positions = view(cl.postions, indx),
+        positions = view(cl.positions, indx),
         species = view(cl.species, indx),
         indices = view(cl.indices, indx)
     )
@@ -39,7 +51,7 @@ end
 function Base.getindex(cl::CellList, i::Int)
     indx = cl.cell_indices[i]
     return (
-        positions = view(cl.postions, indx),
+        positions = view(cl.positions, indx),
         species = view(cl.species, indx),
         indices = view(cl.indices, indx)
     )
@@ -50,7 +62,7 @@ function Base.getindex(cl::CellList, i::Int, j::Int, k::Int)
     if 0<i<=s[1] && 0<j<=s[2] && 0<k<=s[3]
         indx = cl.cell_indices[i,j,k]
         return (
-            positions = view(cl.postions, indx),
+            positions = view(cl.positions, indx),
             species = view(cl.species, indx),
             indices = view(cl.indices, indx),
             sift = _get_shift(cl, i,j,k)
@@ -62,7 +74,7 @@ function Base.getindex(cl::CellList, i::Int, j::Int, k::Int)
         indx = cl.cell_indices[ii,jj,kk]
         sift = _get_shift(cl, i,j,k)
         return (
-            positions = view(cl.postions, indx),
+            positions = view(cl.positions, indx),
             species = view(cl.species, indx),
             indices = view(cl.indices, indx),
             sift = sift
@@ -87,7 +99,7 @@ function Base.getindex(cl::CellList, i, j, k)
             1<=minimum(k) && maximum(k)<=s[3]
         indx = vcat(cl.cell_indices[i,j,k]...)
         return (
-            positions = view(cl.postions, indx),
+            positions = view(cl.positions, indx),
             species = view(cl.species, indx),
             indices = view(cl.indices, indx)
         )
