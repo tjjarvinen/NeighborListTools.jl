@@ -106,7 +106,7 @@ function Base.getindex(cl::CellList, i, j, k)
     else
         tmp = [ cl[a,b,c] for a in i, b in j, c in k ]
         pos = mapreduce(vcat, tmp) do x
-            map(y->y - x.sift, x.positions)
+            map(y->y + x.sift, x.positions)
         end
         spc = mapreduce(x->x.species, vcat, tmp)
         indx = mapreduce(x->x.indices, vcat, tmp)
