@@ -1,4 +1,4 @@
-mutable struct PairIterator{TCL, TI}
+struct PairIterator{TCL, TI}
     clist::TCL
     indices::TI
     npairs::Int
@@ -7,10 +7,18 @@ end
 Base.IteratorSize(::PairIterator) = Base.SizeUnknown()
 
 
-function give_pair_iterators(cl::CellList; n::Int=4, npairs=64)
-    map( chunks( CartesianIndices(cl.cell_indices); n=n) ) do c
-        PairIterator(cl, c, npairs)
+function give_site_iterators(cl::CellList, n::Int)
+    return map( chunks( CartesianIndices(cl.cell_indices); n=n)  ) do c
+        return CellIterator(cl, c, true)
     end
+end
+
+
+function give_pair_iterators(cl::CellList, n::Int; npairs::Int=0)
+    tmp =  map( chunks( CartesianIndices(cl.cell_indices); n=n) ) do c
+        CellIterator(cl, c, npairs)
+    end
+    return tmp
 end
 
 
@@ -133,3 +141,39 @@ function  Base.iterate(pi::PairIterator, state)
     return item, state
 end
 
+##
+
+
+struct CellIterator{TCL, TI}
+    clist::TCL
+    indices::TI
+    sites::Bool
+end
+
+Base.length(cl::CellIterator) = length(cl.indices)
+
+
+function Base.iterate(cl::CellIterator)
+    new = iterate(cl.indices)
+    isnothing(new) && return nothing
+    item, state = new
+    if cl.sites
+        tmp = get_site_pairlist(cl.clist, item)
+    else
+        tmp = get_pairlist(cl.clist, item)
+    end
+    return tmp, state
+end
+
+
+function Base.iterate(cl::CellIterator, state)
+    new = iterate(cl.indices, state)
+    isnothing(new) && return nothing
+    item, state = new
+    if cl.sites
+        tmp = get_site_pairlist(cl.clist, item)
+    else
+        tmp = get_pairlist(cl.clist, item)
+    end
+    return tmp, state
+end
