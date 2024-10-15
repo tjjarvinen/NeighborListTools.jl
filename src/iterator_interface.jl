@@ -15,8 +15,14 @@ end
 
 
 function give_pair_iterators(cl::CellList, n::Int; npairs::Int=0)
-    tmp =  map( chunks( CartesianIndices(cl.cell_indices); n=n) ) do c
-        CellIterator(cl, c, npairs)
+    if npairs > 0
+        tmp =  map( chunks( CartesianIndices(cl.cell_indices); n=n) ) do c
+            CellIterator(cl, c, false)
+        end
+    else
+        tmp =  map( chunks( CartesianIndices(cl.cell_indices); n=n) ) do c
+            CellIterator(cl, c, false)
+        end
     end
     return tmp
 end

@@ -54,6 +54,27 @@ for i in eachindex(cl)
 end
 ```
 
+## Iterator interface
+
+
+```julia
+
+# Give 4 pair interaction iterators
+iterators = give_pair_iterators(cl, 4)
+# or give 3 site potential pair iterators
+iterators = give_site_iterators(cl, 4)
+
+Threads.@threads for iter in iterators
+    for neighbors in iter
+        # do something
+        nothing
+    end
+end
+
+```
+
+
+
 ## GPU support
 
 GPU support is not yet fully working.
