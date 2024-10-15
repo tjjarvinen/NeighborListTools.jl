@@ -61,7 +61,7 @@ end
 
 # Give 4 pair interaction iterators
 iterators = give_pair_iterators(cl, 4)
-# or give 3 site potential pair iterators
+# or give 4 site potential pair iterators
 iterators = give_site_iterators(cl, 4)
 
 Threads.@threads for iter in iterators
