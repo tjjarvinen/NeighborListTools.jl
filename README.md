@@ -56,6 +56,7 @@ end
 
 ## Iterator interface
 
+Note, this is experimental.
 
 ```julia
 

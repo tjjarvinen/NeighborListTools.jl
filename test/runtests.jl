@@ -38,3 +38,63 @@ using Test
     @test haskey(pairs, :indx1)
     @test haskey(pairs, :indx2)
 end
+
+
+@testset "Iterator interface" begin
+    cutoff = 9.0u"Å"
+    sys = bulk(:Ar, cubic=true) * 20
+    cl = CellList(sys, cutoff)
+
+    @testset "Pair iterator"  begin
+        pair_iter = give_pair_iterators(cl, 4)
+        
+        @test length(pair_iter) == 4
+
+        new, i = iterate(pair_iter[1])
+
+        @test isa(new, NamedTuple)
+        @test hasproperty(new, :r)
+        @test hasproperty(new, :species1)
+        @test hasproperty(new, :species2)
+        @test hasproperty(new, :origin_indx1)
+        @test hasproperty(new, :origin_indx2)
+
+        @test isa(new.r, AbstractVector)    
+        @test isa(new.species1, AbstractVector)
+        @test isa(new.species2, AbstractVector)
+        @test isa(new.origin_indx1, AbstractVector)
+        @test isa(new.origin_indx2, AbstractVector)
+
+        @test length(new.r) == length(new.species1)
+        @test length(new.r) == length(new.species2)
+        @test length(new.r) == length(new.origin_indx1)
+        @test length(new.r) == length(new.origin_indx2)
+    end
+
+    @testset "Site iterator" begin
+        site_iter = give_site_iterators(cl, 4)
+
+        @test length(site_iter) == 4
+
+        new, i = iterate(site_iter[1])
+
+        @test isa(new, NamedTuple)
+        @test hasproperty(new, :r)
+        @test hasproperty(new, :species1)
+        @test hasproperty(new, :species2)
+        @test hasproperty(new, :origin_indx1)
+        @test hasproperty(new, :origin_indx2)
+
+        @test isa(new.r, AbstractVector)    
+        @test isa(new.species1, AbstractVector)
+        @test isa(new.species2, AbstractVector)
+        @test isa(new.origin_indx1, AbstractVector)
+        @test isa(new.origin_indx2, AbstractVector)
+
+        @test length(new.r) == length(new.species1)
+        @test length(new.r) == length(new.species2)
+        @test length(new.r) == length(new.origin_indx1)
+        @test length(new.r) == length(new.origin_indx2)
+    end
+    
+end
