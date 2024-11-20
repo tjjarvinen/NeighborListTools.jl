@@ -31,10 +31,11 @@ end
 
 function test_pairlist(sys, cutoff; use_fp32=false)
     cl = NeighborListTools.form_cell_list(sys, cutoff; use_fp32=use_fp32)
-    s = size(cl)
-    tmp = [ (i,j,k) for i in 1:s[1], j in 1:s[2], k in 1:s[2]]
-    Threads.@threads for x in tmp
-        NeighborListTools.get_pairlist(cl, x...)
+    iterators = give_pair_iterators(cl, Threads.nthreads())
+    Threads.@threads for iter in iterators
+        for neighbors in iter
+            nothing
+        end
     end
 end
 
