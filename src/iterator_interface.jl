@@ -159,14 +159,14 @@ end
 Base.length(cl::CellIterator) = length(cl.indices)
 
 
-function Base.iterate(cl::CellIterator)
-    new = iterate(cl.indices)
+function Base.iterate(ci::CellIterator)
+    new = iterate(ci.indices)
     isnothing(new) && return nothing
     item, state = new
-    if cl.sites
-        tmp = get_site_pairlist(cl.clist, item)
+    if ci.sites
+        tmp = get_site_pairlist(ci.clist, item)
     else
-        tmp = get_pairlist(cl.clist, item)
+        tmp = get_pairlist(ci.clist, item)
     end
     return tmp, state
 end
