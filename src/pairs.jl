@@ -147,7 +147,11 @@ function _distances_sites(cutoff, r1, r2)
 end
 
 # For CPU
-function _distances_pairs(cutoff, r1::SubArray{<:Any, 1, <:Array, <:Any}, r2::SubArray{<:Any, 1, <:Array, <:Any})
+function _distances_pairs(
+    cutoff, 
+    r1::Union{SubArray{<:Any, 1, <:Array, <:Any}, Vector}, 
+    r2::Union{SubArray{<:Any, 1, <:Array, <:Any}, Vector}
+)
     r = Distances.pairwise(Distances.Euclidean(), r1, r2)
     findx = findall(x-> x <(cutoff), r)
     fi1 = [ x[1] for x in findx if x[1] < x[2] ]
@@ -155,7 +159,11 @@ function _distances_pairs(cutoff, r1::SubArray{<:Any, 1, <:Array, <:Any}, r2::Su
     return fi1, fi2
 end
 
-function _distances_sites(cutoff, r1::SubArray{<:Any, 1, <:Array, <:Any}, r2::SubArray{<:Any, 1, <:Array, <:Any})
+function _distances_sites(
+    cutoff,
+    r1::Union{SubArray{<:Any, 1, <:Array, <:Any}, Vector}, 
+    r2::Union{SubArray{<:Any, 1, <:Array, <:Any}, Vector}
+)
     r = Distances.pairwise(Distances.Euclidean(), r1, r2)
     findx = findall(x-> zero(cutoff) < x <(cutoff), r)
     fi1 = [ x[1] for x in findx ]

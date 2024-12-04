@@ -92,6 +92,9 @@ cutoff = 9.0u"Å"
 sys = bulk(:Ar, cubic=true) * 15
 
 cl = CellList(CuArray, sys, cutoff)
+
+pl = get_pairlist(cl, 1,1,1)
 ```
 
-Trying to calculate pairlist fails though.
+Iterator interface does not work with GPU.
+GPU is also very slow compared to CPU due to kernel lauch latency.
