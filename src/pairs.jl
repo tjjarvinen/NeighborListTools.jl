@@ -17,11 +17,43 @@ function get_site_pairlist(cl::CellList, carindex::CartesianIndex)
 end
 
 
-function get_pairs(cl::CellList, c1, c2)
-    # This uses scalar indexing and need to be changed for GPU
-    r = Distances.pairwise(Distances.Euclidean(), c1.positions, c2.positions)
+function _dis(r1, r2)
+    Δr = r2 - r1
+    return sqrt( sum(x->x^2, Δr) )
+end
 
+
+@kernel function _distances_kernel(out, @Const(R1), @Const(R2))
+    J = @index(Global)
+    for i in 1:length(R1)
+        @inbounds out[i, J] = _dis(R1[i], R2[J])
+    end
+end
+
+# General CPU + GPU
+function _distances(r1, r2)
+    backend = get_backend(r1)
+    @assert backend == get_backend(r2)
+
+    r = similar(r1, (eltype∘eltype)(r1), length(r1), length(r2))
+
+    kernel = _distances_kernel(backend)
+    kernel(r, r1, r2; ndrange=length(r2))
+    return r
+end
+
+# For CPU
+function _distances(r1::SubArray{<:Any, 1, <:Array, <:Any}, r2::SubArray{<:Any, 1, <:Array, <:Any})
+    return Distances.pairwise(Distances.Euclidean(), r1, r2)
+end
+
+
+function get_pairs(cl::CellList, c1, c2)
+    r = _distances(c1.positions, c2.positions)
+
+    # This does not work with GPU
     findx = findall(x-> zero(cl.cutoff)< x <(cl.cutoff), r)
+    
     fi1 = [ x[1] for x in findx ]
     fi2 = [ x[2] for x in findx ]
 
