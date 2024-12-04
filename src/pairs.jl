@@ -18,7 +18,8 @@ end
 
 function _get_sites(cl::CellList, c1, c2)
     fi1, fi2 = _distances_sites(cl.cutoff, c1.positions, c2.positions)
-
+    r_tmp = view(c2.positions,fi2) - view(c1.positions,fi1)
+    r, mask = swap_dims(Float32, r_tmp)
     return (
         indx1 = fi1,
         indx2 = fi2,
@@ -26,13 +27,19 @@ function _get_sites(cl::CellList, c1, c2)
         origin_indx2 = view(c2.indices, fi2),
         species1 = view(c1.species,fi1),
         species2 = view(c2.species, fi2),
-        r = view(c2.positions,fi2) - view(c1.positions,fi1),
+        r = r_tmp,
+        x = view(r, :,1),
+        y = view(r, :,2),
+        z = view(r, :,3),
+        mask = mask,
     )
 end
 
 function _get_pairs(cl::CellList, c1, c2)
     fi1, fi2 = _distances_pairs(cl.cutoff, c1.positions, c2.positions)
 
+    r_tmp = view(c2.positions,fi2) - view(c1.positions,fi1)
+    r, mask = swap_dims(Float32, r_tmp)
     return (
         indx1 = fi1,
         indx2 = fi2,
@@ -48,7 +55,11 @@ function _get_pairs(cl::CellList, c1, c2)
         origin_indx2 = view(c2.indices, fi2),
         species1 = view(c1.species,fi1),
         species2 = view(c2.species, fi2),
-        r = view(c2.positions,fi2) - view(c1.positions,fi1),
+        r = r_tmp,
+        x = view(r, :,1),
+        y = view(r, :,2),
+        z = view(r, :,3),
+        mask = mask
     )
 end
 
@@ -172,3 +183,19 @@ function _distances_sites(
 end
 
 ## end kernels for pair index generation
+
+# util to swap dimension to form correct vector
+function swap_dims(T, R; vl=16)
+    r = reinterpret(reshape, T, R)
+    l = div(size(r,2), vl, RoundUp) * vl
+    #out = Matrix{T}(undef, l, size(r,1))
+    #out = ones(T, l, size(r,1))
+    out = similar(R, T,(l, size(r,1)))
+    out .= one(T)
+    tmp = @view out[1:size(r,2), :]
+    permutedims!(tmp, r, (2,1))
+    mask = ones(Float32, l)
+    tmp = @view mask[size(r,2)+1:end]
+    tmp .= 0
+    return out, mask
+end
